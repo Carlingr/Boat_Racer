@@ -1,14 +1,27 @@
-var rocket
+var ship
 
 function setup() {
-  rocket = new Rocket();
+  ship = new Ship();
   createCanvas(windowWidth, windowHeight);
   angleMode(DEGREES) //make my head hurt less
 }
 
 function draw() {
   background("black")
-  rocket.x = mouseX
-  rocket.y = mouseY
-  rocket.disp();
+  if (keyDown("A")) {
+    ship.dir -= 4;
+  }
+  if (keyDown("D")) {
+    ship.dir += 4;
+  }
+  if (keyDown("W")) {
+    ship.speed++;
+  }
+  ship.mve();
+  ship.disp();
+  console.log("(" + ship.x + "," + ship.y + ")");
+}
+
+function windowResized() {
+  resizeCanvas(windowWidth, windowHeight)
 }
