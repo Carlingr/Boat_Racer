@@ -5,6 +5,9 @@ var end
 var weight
 var pathSeg
 var lines = []
+var colors = []
+var gameState = 0; //0 is play, 1 is loss
+var cnv
 
 function preload() {
   shipImage = loadImage("images/ship.svg");
@@ -12,14 +15,17 @@ function preload() {
 }
 
 function setup() {
-  createCanvas(windowWidth, windowHeight);
+  cnv = createCanvas(windowWidth, windowHeight);
   //angleMode(DEGREES) //make my head hurt lessship = createSprite(width/2, height/2);
 
   ship.friction = .93
   ship.addImage(shipImage)
 
+  colors[0] = color("blue")
+  colors[1] = color("aqua")
+  colors[2] = color("#0e0");
+
   generateGame(100, 50);
-  //lines[0].active = true
 }
 
 function draw() {
@@ -35,24 +41,14 @@ function draw() {
   if (keyDown("W")) {
     ship.addSpeed(.2, ship.rotation);
   }
-  /* console.log("lines active")
-   for (i = 0; i < lines.length; i++) {
-     console.log(lines[i].active)
-     if (lines[i].active === true) {
-       if (dist(ship.position.x, ship.position.y, lines[i].x2, lines[i].y2) < 15) {
-         lines[i].active = false
-         lines[i + 1].active = true
-       }
-     }
-   }*/
 
-  background("#0e0");
+  background(colors[2]);
 
-  stroke("aqua");
+  stroke(colors[1]);
   for (i = 0; i < lines.length; i++) {
     lines[i].disp1();
   }
-  stroke("blue")
+  stroke(colors[0])
   for (i = 0; i < lines.length; i++) {
     lines[i].disp2();
   }
@@ -60,6 +56,14 @@ function draw() {
   if (dist(ship.position.x, ship.position.y, lines[lines.length - 1].x2, lines[lines.length - 1].y2) < 15) {
     generateGame(90, 50)
   }
+
+  if (cnv.get(ship.position.x, ship.position.y) == colors[0]) {}
+
+  if (gameState == 1) { //if the game is over
+    background("green");
+    console.log("I think you found the shore!")
+  }
+
   drawSprites();
 }
 
