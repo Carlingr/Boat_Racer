@@ -5,7 +5,14 @@ var end //holds endtime
 var lines = [] //holds the path the boat needs to take
 var colors = [] //holds the colors used, this is so they can be refrenced later
 var gameState = 0; //0 is play, 1 is loss, 2 is win
+var strk = 30
+
+//<dom variables>
 var cnv //holds the canvas in case of DOM
+var head;
+var infoP;
+var playbtn;
+//</dom vars>
 
 function preload() {
   shipImage = loadImage("images/ship.svg"); //load the image for the ship
@@ -13,6 +20,9 @@ function preload() {
 }
 
 function setup() {
+
+  //<set up the DOM>
+  //<make the canvas>
   var wth; //holds width of canvas
   if (windowWidth < 500) { //the game is too hard to play if the canvas is giant
     wth = windowWidth //set the width to the window width
@@ -24,7 +34,24 @@ function setup() {
   } else { // if the window is biiger then 500
     cnv = createCanvas(wth, 500) //make a big canvas
   }
-
+  cnv.parent('game');
+  cnv.hide; //hide until game starts
+  //</make the canvas>
+  //<make everthing else>
+  head = createElement("h2")
+  head.hide();
+  head.style("margin", "auto")
+  infoP = createP();
+  infoP.hide();
+  playbtn = createButton("Play");
+  playbtn.mousePressed(generateGame);
+  //<make everthing else>
+  //<assign parents to everthing else>
+  head.parent('game');
+  infoP.parent('game');
+  playbtn.parent('game');
+  //</assign parents to everthing else>
+  //</Set up DOM>
   ship.friction = .93; //put some friction in the situation
   ship.addImage(shipImage); //put a face to the name
   //<init the colors>
@@ -33,6 +60,8 @@ function setup() {
   colors[2] = color('#0e0');
   //</init the colors>
   generateGame(); //make the game
+  cnv.hide();
+  playbtn.show();
 }
 
 function draw() {
@@ -47,7 +76,7 @@ function draw() {
     lines[i].disp2(); //the inner lines this time
   }
   //</draw the lines>
-  if (dist(ship.position.x, ship.position.y, lines[lines.length - 1].x2, lines[lines.length - 1].y2) < 50) { //if we finish the course
+  if (dist(ship.position.x, ship.position.y, lines[lines.length - 1].x2, lines[lines.length - 1].y2) < strk*2) { //if we finish the course
     gameState = 2; //goto Win
   }
 
@@ -62,7 +91,6 @@ function draw() {
   text(round((end - start) / 10) / 100, 20, 40) //time on course
 
   if (gameState === 0) { //if we re playing
-    end = millis(); //note the time
     var rot = (sqrt((ship.velocity.y * ship.velocity.y) + (ship.velocity.x * ship.velocity.x))); //sort out how fast were going
     //p5.play helpfully only give the x and y velocities seperately, so we have to use pytagorus to sort it
     //rot makes a numerical relationshp betwwen the forward speed and the turnign speed
@@ -79,6 +107,7 @@ function draw() {
 
     var shipColor = color(cnv.get(ship.position.x, ship.position.y)); //gets the color of the canvas under the ship to determine how close to shore it is
 
+    end = millis(); //note the time
     switch (shipColor.levels[1]) { //google switch/case
       case colors[0].levels[1]: //if in the main channel
         ship.friction = .93; //full speed
@@ -91,41 +120,24 @@ function draw() {
         break;
       default:
     }
+    drawSprites(); //make the boat
   } else if (gameState == 1) { //if we lost
     //<let the player know>
-    textAlign(CENTER, CENTER);
-    fill("white");
-    textStyle(BOLD);
-    textSize(width / 50)
-    text("You've run aground! Reload the page to play again", width / 2, height / 2);
+    cnv.hide()
+    head.html("You've run aground.")
+    head.show();
+    playbtn.html("Try Again")
+    playbtn.show();
     //</let the player know>
   } else if (gameState == 2) { //if we won
     //<let the player know>
-    textAlign(CENTER, CENTER);
-    fill("white");
-    textStyle(BOLD);
-    textSize(width / 50)
-    text("You've reached the end of the course! Reload the page to play again", width / 2, height / 2);
+    cnv.hide()
+    head.html("You won!")
+    head.show();
+    infoP.html("Your time was " + (round((end - start) / 10) / 100));
+    infoP.show();
+    playbtn.html("Play Again")
+    playbtn.show();
     //<let the player know>
   }
-  drawSprites(); //fnd the boat
-}
-
-function generateGame() { //make a new game
-  var pathX = []; //
-  var pathY = [];
-  lines = []
-  for (var i = 0; i < (height / (100 * 1.50)); i++) {
-    pathY.push(round(random(i * (100 * 1.50), i * (100 * 1.50))))
-    pathX.push(round(random(0, width)))
-  }
-  pathX.push(round(random(0, width)))
-  for (i = 0; i < pathY.length - 1; i += 1) {
-    lines.push(new Line(pathX[i], pathY[i], pathX[i], pathY[i + 1], 50))
-    lines.push(new Line(pathX[i], pathY[i + 1], pathX[i + 1], pathY[i + 1], 50))
-  }
-  ship.rotation = 90
-  ship.position.x = lines[0].x1
-  ship.position.y = 15
-  start = millis()
 }
