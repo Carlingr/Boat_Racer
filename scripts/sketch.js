@@ -16,11 +16,10 @@ var playbtn;
 
 function preload() {
   shipImage = loadImage("images/ship.svg"); //load the image for the ship
-  ship = createSprite(); //make sprite in p5.play
 }
 
 function setup() {
-
+  ship = createSprite(); //make sprite in p5.play
   //<set up the DOM>
   //<make the canvas>
   var wth; //holds width of canvas
@@ -52,7 +51,7 @@ function setup() {
   playbtn.parent('game');
   //</assign parents to everthing else>
   //</Set up DOM>
-  ship.friction = .93; //put some friction in the situation
+  ship.friction = .25; //put some friction in the situation
   ship.addImage(shipImage); //put a face to the name
   //<init the colors>
   colors[0] = color('blue');
@@ -62,6 +61,7 @@ function setup() {
   generateGame(); //make the game
   cnv.hide();
   playbtn.show();
+  console.log(ship)
 }
 
 function draw() {
@@ -76,7 +76,7 @@ function draw() {
     lines[i].disp2(); //the inner lines this time
   }
   //</draw the lines>
-  if (dist(ship.position.x, ship.position.y, lines[lines.length - 1].x2, lines[lines.length - 1].y2) < strk*2) { //if we finish the course
+  if (dist(ship.position.x, ship.position.y, lines[lines.length - 1].x2, lines[lines.length - 1].y2) < strk * 2) { //if we finish the course
     gameState = 2; //goto Win
   }
 
@@ -90,7 +90,7 @@ function draw() {
   text("WAD to move", 20, 20) //Instructions in the corner
   text(round((end - start) / 10) / 100, 20, 40) //time on course
 
-  if (gameState === 0) { //if we re playing
+  if (gameState === 0) { //if we're playing
     var rot = (sqrt((ship.velocity.y * ship.velocity.y) + (ship.velocity.x * ship.velocity.x))); //sort out how fast were going
     //p5.play helpfully only give the x and y velocities seperately, so we have to use pytagorus to sort it
     //rot makes a numerical relationshp betwwen the forward speed and the turnign speed
@@ -102,7 +102,7 @@ function draw() {
       ship.rotation += rot * 2; //turn right
     }
     if (keyDown("W")) { //if W key is pressed
-      ship.addSpeed(.2, ship.rotation); //give her power
+      ship.addSpeed(.8, ship.rotation); //give her power
     }
 
     var shipColor = color(cnv.get(ship.position.x, ship.position.y)); //gets the color of the canvas under the ship to determine how close to shore it is
@@ -110,10 +110,10 @@ function draw() {
     end = millis(); //note the time
     switch (shipColor.levels[1]) { //google switch/case
       case colors[0].levels[1]: //if in the main channel
-        ship.friction = .93; //full speed
+        ship.friction = .25; //full speed
         break;
       case colors[1].levels[1]: //if approacing shore
-        ship.friction = .9 //slow down
+        ship.friction = .3 //slow down
         break;
       case colors[2].levels[1]: //if aground
         gameState = 1; //end game
